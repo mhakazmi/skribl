@@ -1,0 +1,95 @@
+@import url('https://fonts.googleapis.com/css2?family=Boogaloo&family=Nunito:wght@400;600;700;800&family=Space+Mono:wght@400;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: #1a1a2e;
+  color: #eaeaea;
+  font-family: 'Nunito', sans-serif;
+  overflow: hidden;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.35);
+}
+
+/* Drawing canvas cursor */
+.canvas-draw {
+  cursor: crosshair;
+}
+.canvas-fill {
+  cursor: cell;
+}
+.canvas-erase {
+  cursor: cell;
+}
+
+/* Color swatch */
+.color-swatch {
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+.color-swatch:hover {
+  transform: scale(1.2);
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.4);
+  z-index: 10;
+}
+.color-swatch.active {
+  transform: scale(1.25);
+  box-shadow: 0 0 0 3px #fff;
+  z-index: 10;
+}
+
+/* Word hint letters */
+.hint-letter {
+  display: inline-block;
+  min-width: 1.2ch;
+  text-align: center;
+}
+
+/* Lobby background gradient blobs */
+.lobby-bg::before {
+  content: '';
+  position: fixed;
+  top: -20%;
+  left: -10%;
+  width: 50%;
+  height: 50%;
+  background: radial-gradient(circle, rgba(79, 134, 247, 0.15) 0%, transparent 70%);
+  pointer-events: none;
+}
+.lobby-bg::after {
+  content: '';
+  position: fixed;
+  bottom: -20%;
+  right: -10%;
+  width: 50%;
+  height: 50%;
+  background: radial-gradient(circle, rgba(199, 125, 255, 0.12) 0%, transparent 70%);
+  pointer-events: none;
+}
