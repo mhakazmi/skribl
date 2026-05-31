@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { useSocket } from '../../context/SocketContext';
 import { useGame } from '../../context/GameContext';
 import Avatar from '../ui/Avatar';
-import Button from '../ui/Button';
 
 export default function WaitingRoomScreen() {
   const socket = useSocket();
@@ -22,100 +21,83 @@ export default function WaitingRoomScreen() {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const handleStart = () => {
-    socket.emit('game:start');
-  };
-
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center px-4 py-8 lobby-bg">
-      <div className="w-full max-w-lg">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="font-display text-5xl text-white mb-1">Waiting Room</h1>
-          <p className="text-white/50 font-ui">
-            {room.settings.rounds} rounds · {room.settings.drawTime}s draw time · up to {room.settings.maxPlayers} players
+    <div className="game-bg min-h-screen flex flex-col items-center justify-center px-4 py-8 overflow-auto">
+      <div className="w-full max-w-md flex flex-col gap-4">
+
+        {/* Title */}
+        <div className="text-center mb-2">
+          <h1 className="font-display text-5xl text-white" style={{ textShadow: '4px 4px 0 #1D3BB3', WebkitTextStroke: '1px #1A1A2E' }}>
+            Waiting Room
+          </h1>
+          <p className="text-white/80 font-ui font-bold text-sm mt-1">
+            {room.settings.rounds} rounds · {room.settings.drawTime}s · up to {room.settings.maxPlayers} players
           </p>
         </div>
 
         {/* Room code */}
-        <div className="bg-navy-800 rounded-2xl p-5 border border-white/10 mb-4 text-center">
-          <p className="text-white/50 font-ui text-sm mb-2">Room Code</p>
+        <div className="card p-5 text-center">
+          <p className="text-ink/60 font-ui font-black text-xs uppercase tracking-widest mb-2">Room Code</p>
           <div className="flex items-center justify-center gap-3">
-            <span className="font-mono text-4xl font-bold text-brand-yellow tracking-widest">
-              {room.code}
-            </span>
+            <span className="font-mono text-4xl font-bold text-brand-blue tracking-[0.3em]">{room.code}</span>
             <button
               onClick={copyCode}
-              className="px-3 py-1.5 bg-brand-yellow/20 hover:bg-brand-yellow/30 text-brand-yellow rounded-lg font-ui text-sm transition-colors"
+              className="btn btn-yellow px-3 py-2 text-sm"
             >
               {copied ? '✓ Copied!' : '📋 Copy'}
             </button>
           </div>
-          <p className="text-white/30 font-ui text-xs mt-2">Share this code with friends</p>
         </div>
 
         {/* Players */}
-        <div className="bg-navy-800 rounded-2xl p-5 border border-white/10 mb-4">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="font-ui font-bold text-white/80">
+        <div className="card p-5">
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="font-ui font-black text-ink">
               Players ({room.players.length}/{room.settings.maxPlayers})
             </h2>
             <div className="flex gap-1">
               {Array.from({ length: room.settings.maxPlayers }).map((_, i) => (
-                <div
-                  key={i}
-                  className={`w-2 h-2 rounded-full ${i < room.players.length ? 'bg-brand-green' : 'bg-white/20'}`}
-                />
+                <div key={i} className={`w-2.5 h-2.5 rounded-full border border-ink ${i < room.players.length ? 'bg-brand-green' : 'bg-gray-200'}`} />
               ))}
             </div>
           </div>
+
           <div className="grid grid-cols-2 gap-2">
             {room.players.map(player => (
               <div
                 key={player.id}
-                className={`flex items-center gap-3 px-3 py-2 rounded-xl transition-all
-                  ${player.id === playerId ? 'bg-brand-blue/20 border border-brand-blue/30' : 'bg-navy-700/50'}`}
+                className={`flex items-center gap-2 px-3 py-2.5 rounded-xl border-2 border-ink transition-all ${player.id === playerId ? 'bg-brand-blue/10' : 'bg-white/50'}`}
+                style={{ boxShadow: '2px 2px 0 #1A1A2E' }}
               >
                 <Avatar name={player.name} color={player.avatarColor} size="sm" isHost={player.isHost} />
-                <span className="font-ui font-semibold text-sm text-white truncate">{player.name}</span>
-                {player.id === playerId && (
-                  <span className="ml-auto text-xs text-brand-blue font-ui">You</span>
-                )}
+                <span className="font-ui font-bold text-sm text-ink truncate">{player.name}</span>
+                {player.id === playerId && <span className="ml-auto text-xs font-black text-brand-blue">You</span>}
               </div>
             ))}
-            {/* Empty slots */}
-            {Array.from({ length: Math.max(0, 2 - room.players.length) }).map((_, i) => (
-              <div key={`empty-${i}`} className="flex items-center gap-3 px-3 py-2 rounded-xl bg-navy-700/20 border border-dashed border-white/10">
-                <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white/20 text-xs">?</div>
-                <span className="font-ui text-sm text-white/20">Waiting...</span>
+            {room.players.length < 2 && Array.from({ length: 2 - room.players.length }).map((_, i) => (
+              <div key={`e${i}`} className="flex items-center gap-2 px-3 py-2.5 rounded-xl border-2 border-dashed border-ink/30 bg-white/20">
+                <div className="w-8 h-8 rounded-full bg-ink/10 flex items-center justify-center text-ink/30 text-sm font-bold">?</div>
+                <span className="font-ui text-sm text-ink/40 font-bold">Waiting...</span>
               </div>
             ))}
           </div>
         </div>
 
-        {/* Start / waiting */}
+        {/* Start / Waiting */}
         {isHost ? (
-          <div className="flex flex-col gap-2">
-            <Button
-              onClick={handleStart}
+          <div>
+            <button
+              onClick={() => socket.emit('game:start')}
               disabled={!canStart}
-              size="lg"
-              className="w-full"
+              className="btn btn-green w-full py-4 text-xl"
             >
-              {canStart ? '🎮 Start Game!' : `Waiting for players (${room.players.length}/2 min)`}
-            </Button>
-            {!canStart && (
-              <p className="text-center text-white/40 text-sm font-ui">
-                Need at least 2 players to start
-              </p>
-            )}
+              {canStart ? '🎮 Start Game!' : `Need ${2 - room.players.length} more player${2 - room.players.length !== 1 ? 's' : ''}...`}
+            </button>
           </div>
         ) : (
-          <div className="text-center py-4">
-            <div className="inline-flex items-center gap-2 px-5 py-3 bg-navy-800 rounded-full border border-white/10">
-              <span className="animate-pulse2 text-brand-yellow">●</span>
-              <span className="font-ui text-white/60">Waiting for host to start...</span>
-            </div>
+          <div className="card p-4 flex items-center justify-center gap-3">
+            <span className="text-2xl animate-bounce2">⏳</span>
+            <span className="font-ui font-black text-ink">Waiting for host to start...</span>
           </div>
         )}
       </div>

@@ -12,27 +12,24 @@ function ChatMessage({ msg, myId }: { msg: ChatMessageData; myId: string | null 
   if (isSystem) {
     return (
       <div className="text-center py-1">
-        <span className="text-white/40 text-xs font-ui italic">{msg.text}</span>
+        <span className="text-ink/40 text-xs font-ui font-bold italic">{msg.text}</span>
       </div>
     );
   }
 
   return (
-    <div className={`flex gap-1.5 px-2 py-1 rounded-lg text-sm font-ui ${
-      isCorrect ? 'bg-brand-green/20 animate-correctFlash' :
-      isClose ? 'bg-brand-yellow/10' : ''
+    <div className={`flex gap-1.5 px-2 py-1.5 rounded-lg text-sm font-ui ${
+      isCorrect ? 'bg-brand-green/25 animate-correctFlash border border-brand-green/40' :
+      isClose ? 'bg-brand-yellow/25 border border-brand-yellow/40' : ''
     }`}>
-      <span
-        className={`font-bold shrink-0 ${isMe ? 'text-brand-blue' : 'text-white/70'}`}
-        style={{ maxWidth: '90px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
-      >
+      <span className={`font-black shrink-0 ${isMe ? 'text-brand-blue' : 'text-ink/70'}`}
+        style={{ maxWidth: '80px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
         {msg.playerName}:
       </span>
-      <span className={`break-words ${
-        isCorrect ? 'text-brand-green font-bold' :
-        isClose ? 'text-brand-yellow' : 'text-white/90'
+      <span className={`break-words font-semibold ${
+        isCorrect ? 'text-brand-green' : isClose ? 'text-brand-orange' : 'text-ink/90'
       }`}>
-        {isCorrect ? '🎉 Correct!' : isClose ? `🔥 ${msg.text} (so close!)` : msg.text}
+        {isCorrect ? '🎉 Correct!' : isClose ? `🔥 So close!` : msg.text}
       </span>
     </div>
   );
@@ -61,62 +58,45 @@ export default function ChatBox() {
     setInput('');
   };
 
-  const placeholder = isDrawer
-    ? "You're drawing!"
-    : hasGuessed
-    ? "You guessed it! 🎉"
-    : room?.state !== 'DRAWING'
-    ? "Waiting..."
+  const placeholder = isDrawer ? "You're drawing! 🎨"
+    : hasGuessed ? "You got it! 🎉"
+    : room?.state !== 'DRAWING' ? "Waiting..."
     : "Type your guess...";
 
   return (
-    <div className="flex flex-col h-full bg-navy-800 rounded-2xl border border-white/10 overflow-hidden">
-      <div className="px-4 py-3 border-b border-white/10 flex items-center gap-2">
-        <span className="text-lg">💬</span>
-        <span className="font-ui font-bold text-white/80 text-sm">Chat & Guesses</span>
+    <div className="card flex flex-col h-full overflow-hidden p-0">
+      <div className="px-4 py-3 border-b-2 border-ink/10 flex items-center gap-2 shrink-0 bg-brand-blue/5">
+        <span className="text-base">💬</span>
+        <span className="font-ui font-black text-ink text-sm">Chat & Guesses</span>
       </div>
 
-      {/* Messages */}
-      <div className="flex-1 overflow-y-auto px-2 py-2 flex flex-col gap-0.5 min-h-0">
+      <div className="flex-1 overflow-y-auto px-2 py-2 flex flex-col gap-0.5 min-h-0 bg-paper">
         {messages.length === 0 && (
           <div className="flex-1 flex items-center justify-center">
-            <p className="text-white/20 font-ui text-sm text-center">
-              Guesses and chat will appear here!
+            <p className="text-ink/25 font-ui font-bold text-sm text-center px-4">
+              Guesses appear here! 👀
             </p>
           </div>
         )}
-        {messages.map(msg => (
-          <ChatMessage key={msg.id} msg={msg} myId={playerId} />
-        ))}
+        {messages.map(msg => <ChatMessage key={msg.id} msg={msg} myId={playerId} />)}
         <div ref={bottomRef} />
       </div>
 
-      {/* Input */}
-      <form onSubmit={sendMessage} className="px-3 py-3 border-t border-white/10">
-        <div className="flex gap-2">
+      <form onSubmit={sendMessage} className="px-2 py-2 border-t-2 border-ink/10 shrink-0 bg-paper">
+        <div className="flex gap-1.5">
           <input
             value={input}
             onChange={e => setInput(e.target.value)}
             placeholder={placeholder}
             disabled={isInputDisabled}
             maxLength={100}
-            className="
-              flex-1 px-3 py-2 rounded-xl bg-navy-700 border border-white/10
-              text-white placeholder-white/30 font-ui text-sm
-              focus:outline-none focus:ring-2 focus:ring-brand-blue
-              disabled:opacity-40 disabled:cursor-not-allowed
-              transition-all
-            "
+            className="flex-1 px-3 py-2 rounded-xl bg-white border-2 border-ink text-ink placeholder-ink/30 font-ui font-semibold text-sm focus:outline-none focus:ring-2 focus:ring-brand-blue disabled:opacity-40 disabled:cursor-not-allowed"
+            style={{ boxShadow: '2px 2px 0 #1A1A2E' }}
           />
           <button
             type="submit"
             disabled={isInputDisabled || !input.trim()}
-            className="
-              px-3 py-2 bg-brand-blue hover:bg-blue-500 rounded-xl
-              text-white font-bold transition-all
-              disabled:opacity-40 disabled:cursor-not-allowed
-              active:scale-95
-            "
+            className="btn btn-blue px-3 py-2 text-sm"
           >
             ➤
           </button>

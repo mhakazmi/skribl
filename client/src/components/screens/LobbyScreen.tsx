@@ -1,7 +1,6 @@
 import { useState, FormEvent } from 'react';
 import { useSocket } from '../../context/SocketContext';
 import { useGame } from '../../context/GameContext';
-import Button from '../ui/Button';
 import Input from '../ui/Input';
 
 export default function LobbyScreen() {
@@ -15,20 +14,14 @@ export default function LobbyScreen() {
   const [maxPlayers, setMaxPlayers] = useState(8);
   const [loading, setLoading] = useState(false);
 
-  const saveName = (n: string) => {
-    setName(n);
-    localStorage.setItem('skribl-name', n);
-  };
+  const saveName = (n: string) => { setName(n); localStorage.setItem('skribl-name', n); };
 
   const handleCreate = (e: FormEvent) => {
     e.preventDefault();
     if (!name.trim()) return;
     dispatch({ type: 'SET_ERROR', payload: null });
     setLoading(true);
-    socket.emit('room:create', {
-      playerName: name.trim(),
-      settings: { rounds, drawTime, maxPlayers, customWords: [] },
-    });
+    socket.emit('room:create', { playerName: name.trim(), settings: { rounds, drawTime, maxPlayers, customWords: [] } });
     setTimeout(() => setLoading(false), 3000);
   };
 
@@ -41,118 +34,96 @@ export default function LobbyScreen() {
     setTimeout(() => setLoading(false), 3000);
   };
 
+  const selectClass = 'w-full px-3 py-2.5 rounded-xl bg-white font-ui font-bold text-ink border-2 border-ink focus:outline-none focus:ring-2 focus:ring-brand-blue cursor-pointer';
+
   return (
-    <div className="lobby-bg min-h-screen flex flex-col items-center justify-center px-4 py-8 overflow-auto">
-      {/* Logo */}
+    <div className="game-bg min-h-screen flex flex-col items-center justify-center px-4 py-8 overflow-auto">
+
+      {/* Rainbow logo */}
       <div className="mb-8 text-center">
-        <h1 className="font-display text-7xl text-white drop-shadow-lg" style={{ textShadow: '3px 3px 0 #4F86F7, 6px 6px 0 rgba(79,134,247,0.3)' }}>
-          Skribl
+        <h1 className="font-display leading-none select-none" style={{ fontSize: 'clamp(4rem, 12vw, 7rem)' }}>
+          <span className="logo-r" style={{ WebkitTextStroke: '2px #1A1A2E', textShadow: '4px 4px 0 #9E1A3A' }}>S</span>
+          <span className="logo-k" style={{ WebkitTextStroke: '2px #1A1A2E', textShadow: '4px 4px 0 #7a3200' }}>k</span>
+          <span className="logo-i" style={{ WebkitTextStroke: '2px #1A1A2E', textShadow: '4px 4px 0 #7a5c00' }}>r</span>
+          <span className="logo-b" style={{ WebkitTextStroke: '2px #1A1A2E', textShadow: '4px 4px 0 #027a5a' }}>i</span>
+          <span className="logo-b2" style={{ WebkitTextStroke: '2px #1A1A2E', textShadow: '4px 4px 0 #1D3BB3', color: '#00BBF9' }}>b</span>
+          <span className="logo-l" style={{ WebkitTextStroke: '2px #1A1A2E', textShadow: '4px 4px 0 #5a1a9e' }}>l</span>
+          <span style={{ color: '#EF476F', WebkitTextStroke: '2px #1A1A2E', textShadow: '4px 4px 0 #9E1A3A' }}>!</span>
         </h1>
-        <p className="font-ui text-white/60 mt-2 text-lg">Draw. Guess. Win!</p>
+        <p className="font-ui font-black text-white text-lg mt-1" style={{ textShadow: '2px 2px 0 #1D3BB3' }}>
+          Draw it. Guess it. Win it! 🎨
+        </p>
       </div>
 
-      <div className="w-full max-w-md">
-        {/* Tabs */}
-        <div className="flex rounded-2xl bg-navy-800 p-1 mb-6 border border-white/10">
-          {(['create', 'join'] as const).map(t => (
-            <button
-              key={t}
-              onClick={() => setTab(t)}
-              className={`flex-1 py-2.5 rounded-xl font-ui font-bold text-sm transition-all duration-200 ${
-                tab === t
-                  ? 'bg-brand-blue text-white shadow-md'
-                  : 'text-white/50 hover:text-white/80'
-              }`}
-            >
-              {t === 'create' ? '✨ Create Room' : '🚪 Join Room'}
-            </button>
-          ))}
-        </div>
-
+      <div className="w-full max-w-sm">
         {/* Error */}
         {state.error && (
-          <div className="mb-4 px-4 py-3 bg-brand-red/20 border border-brand-red/40 rounded-xl text-brand-red font-ui text-sm animate-popIn">
-            {state.error}
+          <div className="mb-4 px-4 py-3 card-sm text-brand-red font-bold font-ui text-sm animate-popIn border-brand-red" style={{ boxShadow: '3px 3px 0 #9E1A3A' }}>
+            ⚠️ {state.error}
           </div>
         )}
 
-        <div className="bg-navy-800 rounded-2xl p-6 border border-white/10 shadow-2xl">
+        <div className="card p-6">
+          {/* Tabs */}
+          <div className="flex rounded-xl border-2 border-ink overflow-hidden mb-5" style={{ boxShadow: '3px 3px 0 #1A1A2E' }}>
+            {(['create', 'join'] as const).map(t => (
+              <button
+                key={t}
+                onClick={() => setTab(t)}
+                className={`flex-1 py-2.5 font-ui font-black text-sm transition-all duration-150 ${tab === t ? 'tab-active' : 'tab-inactive bg-white'}`}
+              >
+                {t === 'create' ? '✨ Create Room' : '🚪 Join Room'}
+              </button>
+            ))}
+          </div>
+
           {tab === 'create' ? (
             <form onSubmit={handleCreate} className="flex flex-col gap-4">
-              <Input
-                label="Your Name"
-                placeholder="Enter your name..."
-                value={name}
-                onChange={e => saveName(e.target.value)}
-                maxLength={20}
-                required
-              />
+              <Input label="Your Name" placeholder="Enter your name..." value={name} onChange={e => saveName(e.target.value)} maxLength={20} required />
 
-              <div className="grid grid-cols-3 gap-3">
-                <div className="flex flex-col gap-1">
-                  <label className="text-xs font-semibold text-white/60 font-ui">Rounds</label>
-                  <select
-                    value={rounds}
-                    onChange={e => setRounds(Number(e.target.value))}
-                    className="px-3 py-2 rounded-xl bg-navy-700 border border-white/10 text-white font-ui text-sm focus:outline-none focus:ring-2 focus:ring-brand-blue"
-                  >
-                    {[1, 2, 3, 4, 5].map(n => <option key={n} value={n}>{n}</option>)}
-                  </select>
-                </div>
-                <div className="flex flex-col gap-1">
-                  <label className="text-xs font-semibold text-white/60 font-ui">Draw Time</label>
-                  <select
-                    value={drawTime}
-                    onChange={e => setDrawTime(Number(e.target.value))}
-                    className="px-3 py-2 rounded-xl bg-navy-700 border border-white/10 text-white font-ui text-sm focus:outline-none focus:ring-2 focus:ring-brand-blue"
-                  >
-                    {[30, 45, 60, 80, 120].map(n => <option key={n} value={n}>{n}s</option>)}
-                  </select>
-                </div>
-                <div className="flex flex-col gap-1">
-                  <label className="text-xs font-semibold text-white/60 font-ui">Max Players</label>
-                  <select
-                    value={maxPlayers}
-                    onChange={e => setMaxPlayers(Number(e.target.value))}
-                    className="px-3 py-2 rounded-xl bg-navy-700 border border-white/10 text-white font-ui text-sm focus:outline-none focus:ring-2 focus:ring-brand-blue"
-                  >
-                    {[2, 4, 6, 8, 10, 12].map(n => <option key={n} value={n}>{n}</option>)}
-                  </select>
-                </div>
+              <div className="grid grid-cols-3 gap-2">
+                {[
+                  { label: 'Rounds', value: rounds, set: setRounds, opts: [1,2,3,4,5], fmt: (n: number) => String(n) },
+                  { label: 'Draw Time', value: drawTime, set: setDrawTime, opts: [30,45,60,80,120], fmt: (n: number) => `${n}s` },
+                  { label: 'Players', value: maxPlayers, set: setMaxPlayers, opts: [2,4,6,8,10,12], fmt: (n: number) => String(n) },
+                ].map(({ label, value, set, opts, fmt }) => (
+                  <div key={label} className="flex flex-col gap-1">
+                    <label className="text-xs font-black text-ink font-ui">{label}</label>
+                    <select value={value} onChange={e => set(Number(e.target.value))} className={selectClass} style={{ boxShadow: '2px 2px 0 #1A1A2E' }}>
+                      {opts.map(n => <option key={n} value={n}>{fmt(n)}</option>)}
+                    </select>
+                  </div>
+                ))}
               </div>
 
-              <Button type="submit" size="lg" disabled={loading || !name.trim()} className="mt-2 w-full">
-                {loading ? '...' : '🎨 Create Room'}
-              </Button>
+              <button type="submit" disabled={loading || !name.trim()} className="btn btn-green w-full py-4 text-lg mt-1">
+                {loading ? '⏳ Creating...' : '🎨 Create Room'}
+              </button>
             </form>
           ) : (
             <form onSubmit={handleJoin} className="flex flex-col gap-4">
-              <Input
-                label="Your Name"
-                placeholder="Enter your name..."
-                value={name}
-                onChange={e => saveName(e.target.value)}
-                maxLength={20}
-                required
-              />
-              <Input
-                label="Room Code"
-                placeholder="Enter 4-letter code..."
-                value={roomCode}
-                onChange={e => setRoomCode(e.target.value.toUpperCase())}
-                maxLength={4}
-                className="uppercase tracking-widest text-center text-xl"
-                required
-              />
-              <Button type="submit" size="lg" disabled={loading || !name.trim() || roomCode.length !== 4} className="mt-2 w-full">
-                {loading ? '...' : '🚀 Join Game'}
-              </Button>
+              <Input label="Your Name" placeholder="Enter your name..." value={name} onChange={e => saveName(e.target.value)} maxLength={20} required />
+              <div className="flex flex-col gap-1">
+                <label className="text-sm font-black text-ink font-ui">Room Code</label>
+                <input
+                  value={roomCode}
+                  onChange={e => setRoomCode(e.target.value.toUpperCase())}
+                  placeholder="XXXX"
+                  maxLength={4}
+                  required
+                  className="w-full px-4 py-4 rounded-xl bg-white font-mono font-bold text-ink text-3xl text-center tracking-[0.5em] border-2 border-ink uppercase focus:outline-none focus:ring-2 focus:ring-brand-blue"
+                  style={{ boxShadow: '3px 3px 0 #1A1A2E' }}
+                />
+              </div>
+              <button type="submit" disabled={loading || !name.trim() || roomCode.length !== 4} className="btn btn-blue w-full py-4 text-lg mt-1">
+                {loading ? '⏳ Joining...' : '🚀 Join Game'}
+              </button>
             </form>
           )}
         </div>
 
-        <p className="text-center text-white/30 text-xs font-ui mt-6">
-          Share your room code with friends to play together!
+        <p className="text-center text-white/60 font-ui font-bold text-sm mt-5" style={{ textShadow: '1px 1px 0 #1D3BB3' }}>
+          Share the room code with friends to play! 🎉
         </p>
       </div>
     </div>

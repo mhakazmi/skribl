@@ -10,10 +10,10 @@ export default function PlayerList() {
   const sorted = [...room.players].sort((a, b) => b.score - a.score);
 
   return (
-    <div className="flex flex-col gap-2 overflow-y-auto h-full">
-      <div className="px-2 py-1 text-xs font-ui font-bold text-white/40 uppercase tracking-wider">
-        Players · Round {room.currentRound}/{room.totalRounds}
-      </div>
+    <div className="flex flex-col gap-1.5 h-full overflow-y-auto">
+      <p className="text-xs font-black text-ink/50 font-ui uppercase tracking-wider px-1 mb-0.5">
+        Players · {room.currentRound}/{room.totalRounds}
+      </p>
       {sorted.map((player, rank) => {
         const isMe = player.id === playerId;
         const isDrawer = player.id === room.currentDrawerId;
@@ -23,17 +23,14 @@ export default function PlayerList() {
         return (
           <div
             key={player.id}
-            className={`
-              relative flex items-center gap-2.5 px-3 py-2.5 rounded-xl transition-all
-              ${isMe ? 'bg-brand-blue/20 border border-brand-blue/30' : 'bg-navy-800/60 border border-white/5'}
-              ${isDrawer ? 'ring-1 ring-brand-yellow/40' : ''}
-            `}
+            className={`relative flex items-center gap-2 px-2.5 py-2 rounded-xl border-2 border-ink transition-all ${
+              isDrawer ? 'bg-brand-yellow/30' : isMe ? 'bg-brand-blue/15' : 'bg-white/70'
+            }`}
+            style={{ boxShadow: '2px 2px 0 #1A1A2E' }}
           >
-            {/* Rank */}
-            <span className="text-xs font-ui text-white/30 w-4 text-center shrink-0">
+            <span className="text-sm w-5 text-center shrink-0">
               {rank === 0 ? '🥇' : rank === 1 ? '🥈' : rank === 2 ? '🥉' : `${rank + 1}`}
             </span>
-
             <Avatar
               name={player.name}
               color={player.avatarColor}
@@ -42,21 +39,16 @@ export default function PlayerList() {
               isHost={player.isHost && !isDrawer}
               hasGuessed={hasGuessed}
             />
-
             <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-1">
-                <p className={`font-ui font-bold text-sm truncate ${isMe ? 'text-brand-blue' : 'text-white/90'}`}>
-                  {player.name}
-                </p>
-                {!player.isConnected && <span className="text-xs text-white/30">👻</span>}
-              </div>
-              <p className="font-ui text-xs text-white/40">{player.score} pts</p>
+              <p className={`font-ui font-black text-xs truncate ${isMe ? 'text-brand-blue' : 'text-ink'}`}>
+                {player.name}
+              </p>
+              <p className="font-ui text-xs text-ink/50 font-bold">{player.score} pts</p>
             </div>
 
-            {/* Score popup */}
             {popup && (
-              <div className="absolute -top-6 right-2 pointer-events-none animate-floatUp">
-                <span className="font-display text-brand-yellow font-bold text-lg">+{popup.delta}</span>
+              <div className="absolute -top-7 right-1 pointer-events-none animate-floatUp">
+                <span className="font-display text-brand-green text-xl font-black" style={{ WebkitTextStroke: '1px #1A1A2E' }}>+{popup.delta}</span>
               </div>
             )}
           </div>

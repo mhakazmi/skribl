@@ -14,19 +14,15 @@ export default function Avatar({ name, color, size = 'md', isDrawing, isHost, ha
   return (
     <div className="relative inline-flex">
       <div
-        className={`${sizes[size]} rounded-full flex items-center justify-center font-display font-bold text-white select-none`}
-        style={{ backgroundColor: color }}
+        className={`${sizes[size]} rounded-full flex items-center justify-center font-display font-bold text-white select-none border-2 border-ink`}
+        style={{ backgroundColor: color, boxShadow: '2px 2px 0 #1A1A2E' }}
       >
         {initials}
       </div>
-      {isDrawing && (
-        <span className="absolute -top-1 -right-1 text-xs">✏️</span>
-      )}
-      {isHost && !isDrawing && (
-        <span className="absolute -top-1 -right-1 text-xs">👑</span>
-      )}
+      {isDrawing && <span className="absolute -top-1 -right-1 text-xs leading-none">✏️</span>}
+      {isHost && !isDrawing && <span className="absolute -top-1 -right-1 text-xs leading-none">👑</span>}
       {hasGuessed && (
-        <span className="absolute -bottom-1 -right-1 bg-brand-green rounded-full w-4 h-4 flex items-center justify-center text-xs">✓</span>
+        <span className="absolute -bottom-1 -right-1 bg-brand-green border border-ink rounded-full w-4 h-4 flex items-center justify-center text-xs font-bold text-ink">✓</span>
       )}
     </div>
   );

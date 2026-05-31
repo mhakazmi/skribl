@@ -19,53 +19,54 @@ export default function GameScreen() {
   const drawer = room.players.find(p => p.id === room.currentDrawerId);
 
   return (
-    <div className="h-screen flex flex-col overflow-hidden bg-navy-900 p-2 gap-2">
+    <div className="game-bg h-screen flex flex-col overflow-hidden p-2 gap-2">
       {/* Top bar */}
-      <div className="flex items-center justify-between px-4 py-2 bg-navy-800 rounded-2xl border border-white/10 shrink-0">
+      <div className="card-sm flex items-center justify-between px-4 py-2 shrink-0 flex-wrap gap-2"
+           style={{ borderRadius: '12px' }}>
         <div className="flex items-center gap-2">
-          <span className="font-display text-2xl text-white">Skribl</span>
-          <span className="text-white/30">·</span>
-          <span className="font-ui text-sm text-white/60">
+          <span className="font-display text-2xl text-brand-blue" style={{ WebkitTextStroke: '1px #1A1A2E' }}>Skribl!</span>
+          <span className="text-ink/30 font-bold">·</span>
+          <span className="font-ui font-black text-sm text-ink/70">
             Round {room.currentRound}/{room.totalRounds}
           </span>
         </div>
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3">
           {room.state === 'DRAWING' && <RoundTimer />}
           {room.state === 'DRAWING' && (
-            <div className="text-center">
+            <div className="card-sm px-3 py-1.5" style={{ borderRadius: '10px', boxShadow: '2px 2px 0 #1A1A2E' }}>
               {isDrawer ? (
-                <span className="font-ui text-sm text-brand-yellow font-bold">✏️ You're drawing!</span>
+                <span className="font-ui font-black text-sm text-brand-blue">✏️ You're drawing!</span>
               ) : (
-                <span className="font-ui text-sm text-white/60">
-                  {drawer?.name ?? '?'} is drawing
+                <span className="font-ui font-bold text-sm text-ink/70">
+                  ✏️ {drawer?.name ?? '?'} is drawing
                 </span>
               )}
             </div>
           )}
         </div>
 
-        <div className="min-w-[120px] flex justify-end">
+        <div className="min-w-[100px] flex justify-end">
           {room.state === 'DRAWING' && <WordHint />}
         </div>
       </div>
 
-      {/* Main 3-column layout */}
+      {/* 3-column layout */}
       <div className="flex gap-2 flex-1 min-h-0">
-        {/* Left — Player list */}
-        <div className="w-48 shrink-0 overflow-y-auto">
+        {/* Players */}
+        <div className="w-44 shrink-0 overflow-y-auto card-sm p-2">
           <PlayerList />
         </div>
 
-        {/* Center — Canvas */}
+        {/* Canvas */}
         <div className="flex-1 relative min-w-0">
           <DrawingCanvas />
           <RoundBanner />
           {showWordSelect && <WordSelectScreen />}
         </div>
 
-        {/* Right — Chat */}
-        <div className="w-64 shrink-0">
+        {/* Chat */}
+        <div className="w-60 shrink-0">
           <ChatBox />
         </div>
       </div>
