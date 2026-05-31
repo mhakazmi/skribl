@@ -4,7 +4,8 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        display: ['Boogaloo', 'cursive'],
+        logo: ['Fredoka One', 'cursive'],
+        display: ['Fredoka One', 'cursive'],
         ui: ['Nunito', 'sans-serif'],
         mono: ['Space Mono', 'monospace'],
       },

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useSocket } from '../../context/SocketContext';
 import { useGame } from '../../context/GameContext';
 import Avatar from '../ui/Avatar';
+import AnimatedLogo from '../ui/AnimatedLogo';
 
 export default function WaitingRoomScreen() {
   const socket = useSocket();
@@ -27,10 +28,8 @@ export default function WaitingRoomScreen() {
 
         {/* Title */}
         <div className="text-center mb-2">
-          <h1 className="font-display text-5xl text-white" style={{ textShadow: '4px 4px 0 #1D3BB3', WebkitTextStroke: '1px #1A1A2E' }}>
-            Waiting Room
-          </h1>
-          <p className="text-white/80 font-ui font-bold text-sm mt-1">
+          <AnimatedLogo style={{ fontSize: 'clamp(2.8rem, 10vw, 4.5rem)' }} />
+          <p className="text-white/70 font-ui font-semibold text-sm mt-2">
             {room.settings.rounds} rounds · {room.settings.drawTime}s · up to {room.settings.maxPlayers} players
           </p>
         </div>

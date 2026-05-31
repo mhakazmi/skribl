@@ -2,6 +2,7 @@ import { useState, FormEvent } from 'react';
 import { useSocket } from '../../context/SocketContext';
 import { useGame } from '../../context/GameContext';
 import Input from '../ui/Input';
+import AnimatedLogo from '../ui/AnimatedLogo';
 
 export default function LobbyScreen() {
   const socket = useSocket();
@@ -39,19 +40,11 @@ export default function LobbyScreen() {
   return (
     <div className="game-bg min-h-screen flex flex-col items-center justify-center px-4 py-8 overflow-auto">
 
-      {/* Rainbow logo */}
+      {/* Animated logo */}
       <div className="mb-8 text-center">
-        <h1 className="font-display leading-none select-none" style={{ fontSize: 'clamp(4rem, 12vw, 7rem)' }}>
-          <span className="logo-r" style={{ WebkitTextStroke: '2px #1A1A2E', textShadow: '4px 4px 0 #9E1A3A' }}>S</span>
-          <span className="logo-k" style={{ WebkitTextStroke: '2px #1A1A2E', textShadow: '4px 4px 0 #7a3200' }}>k</span>
-          <span className="logo-i" style={{ WebkitTextStroke: '2px #1A1A2E', textShadow: '4px 4px 0 #7a5c00' }}>r</span>
-          <span className="logo-b" style={{ WebkitTextStroke: '2px #1A1A2E', textShadow: '4px 4px 0 #027a5a' }}>i</span>
-          <span className="logo-b2" style={{ WebkitTextStroke: '2px #1A1A2E', textShadow: '4px 4px 0 #1D3BB3', color: '#00BBF9' }}>b</span>
-          <span className="logo-l" style={{ WebkitTextStroke: '2px #1A1A2E', textShadow: '4px 4px 0 #5a1a9e' }}>l</span>
-          <span style={{ color: '#EF476F', WebkitTextStroke: '2px #1A1A2E', textShadow: '4px 4px 0 #9E1A3A' }}>!</span>
-        </h1>
-        <p className="font-ui font-black text-white text-lg mt-1" style={{ textShadow: '2px 2px 0 #1D3BB3' }}>
-          Draw it. Guess it. Win it! 🎨
+        <AnimatedLogo style={{ fontSize: 'clamp(3.5rem, 14vw, 6rem)' }} />
+        <p className="font-ui font-bold text-white/80 text-base mt-2">
+          Draw it. Guess it. Win it.
         </p>
       </div>
 

@@ -25,7 +25,8 @@ interface ToolBarProps {
 
 export default function ToolBar({ color, size, tool, onColorChange, onSizeChange, onToolChange, onClear, onUndo }: ToolBarProps) {
   return (
-    <div className="flex items-center gap-2 px-3 py-2 card-sm flex-wrap"
+    <div className="overflow-x-auto">
+    <div className="flex items-center gap-2 px-3 py-2 card-sm flex-nowrap w-max min-w-full"
          style={{ borderRadius: '12px' }}>
       {/* Colors */}
       <div className="grid grid-cols-9 gap-1">
@@ -88,6 +89,7 @@ export default function ToolBar({ color, size, tool, onColorChange, onSizeChange
       <button onClick={onClear} title="Clear"
         className="w-8 h-8 rounded-lg border-2 border-ink bg-brand-red/20 hover:bg-brand-red/40 flex items-center justify-center text-base transition-all"
         style={{ boxShadow: '2px 2px 0 #1A1A2E' }}>🗑️</button>
+    </div>
     </div>
   );
 }

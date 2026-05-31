@@ -35,7 +35,7 @@ function ChatMessage({ msg, myId }: { msg: ChatMessageData; myId: string | null 
   );
 }
 
-export default function ChatBox() {
+export default function ChatBox({ bare = false }: { bare?: boolean }) {
   const socket = useSocket();
   const { state } = useGame();
   const { messages, room, playerId, guessedPlayers } = state;
@@ -64,11 +64,12 @@ export default function ChatBox() {
     : "Type your guess...";
 
   return (
-    <div className="card flex flex-col h-full overflow-hidden p-0">
-      <div className="px-4 py-3 border-b-2 border-ink/10 flex items-center gap-2 shrink-0 bg-brand-blue/5">
-        <span className="text-base">💬</span>
-        <span className="font-ui font-black text-ink text-sm">Chat & Guesses</span>
-      </div>
+    <div className={`flex flex-col h-full overflow-hidden p-0 ${bare ? '' : 'card'}`}>
+      {!bare && (
+        <div className="px-4 py-3 border-b-2 border-ink/10 flex items-center gap-2 shrink-0 bg-brand-blue/5">
+          <span className="font-ui font-black text-ink text-sm">Chat & Guesses</span>
+        </div>
+      )}
 
       <div className="flex-1 overflow-y-auto px-2 py-2 flex flex-col gap-0.5 min-h-0 bg-paper">
         {messages.length === 0 && (
