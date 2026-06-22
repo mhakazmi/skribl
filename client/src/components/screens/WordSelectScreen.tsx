@@ -1,5 +1,6 @@
 import { useSocket } from '../../context/SocketContext';
 import { useGame } from '../../context/GameContext';
+import { IconPencil, IconQuestion } from '../ui/Icons';
 
 const WORD_COLORS = ['btn-green', 'btn-yellow', 'btn-blue'] as const;
 
@@ -16,9 +17,19 @@ export default function WordSelectScreen() {
   return (
     <div className="absolute inset-0 flex items-center justify-center bg-black/40 z-40 animate-popIn">
       <div className="card p-8 max-w-sm w-full mx-4 text-center">
-        <div className="text-5xl mb-3">{isDrawer ? '✏️' : '🤔'}</div>
+
+        {/* Decorative icon */}
+        <div className={`mx-auto mb-4 w-16 h-16 rounded-2xl border-2 border-ink flex items-center justify-center ${
+          isDrawer ? 'bg-brand-blue' : 'bg-brand-yellow'
+        }`} style={{ boxShadow: '3px 3px 0 #1A1A2E' }}>
+          {isDrawer
+            ? <IconPencil size={32} className="text-white" />
+            : <IconQuestion size={32} className="text-ink" />
+          }
+        </div>
+
         <h2 className="font-display text-3xl text-ink mb-1">
-          {isDrawer ? 'Pick your word!' : `${drawer?.name ?? 'Someone'} is choosing...`}
+          {isDrawer ? 'Pick your word!' : `${drawer?.name ?? 'Someone'} is choosing…`}
         </h2>
         <p className="text-ink/60 font-ui font-bold text-sm mb-6">
           {isDrawer ? 'Choose wisely!' : 'Get ready to guess!'}
@@ -30,7 +41,7 @@ export default function WordSelectScreen() {
               <button
                 key={word}
                 onClick={() => socket.emit('game:word-chosen', { word })}
-                className={`btn ${WORD_COLORS[i % 3]} w-full py-4 text-xl font-display tracking-wide`}
+                className={`btn ${WORD_COLORS[i % 3]} w-full py-4 text-xl font-display tracking-wide cursor-pointer`}
               >
                 {word}
               </button>
@@ -39,8 +50,11 @@ export default function WordSelectScreen() {
         ) : (
           <div className="flex items-center justify-center gap-2 py-4">
             {[0, 1, 2].map(i => (
-              <div key={i} className="w-4 h-4 rounded-full bg-brand-blue border-2 border-ink animate-bounce2"
-                style={{ animationDelay: `${i * 0.15}s` }} />
+              <div
+                key={i}
+                className="w-4 h-4 rounded-full bg-brand-blue border-2 border-ink animate-bounce2"
+                style={{ animationDelay: `${i * 0.15}s` }}
+              />
             ))}
           </div>
         )}

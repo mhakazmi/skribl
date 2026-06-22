@@ -8,6 +8,7 @@ import WordHint from '../game/WordHint';
 import RoundBanner from '../game/RoundBanner';
 import ScorePopups from '../game/ScorePopup';
 import WordSelectScreen from './WordSelectScreen';
+import { IconChat, IconUsers } from '../ui/Icons';
 
 export default function GameScreen() {
   const { state } = useGame();
@@ -71,18 +72,21 @@ export default function GameScreen() {
       {/* ── Mobile bottom panel ── */}
       <div className="md:hidden card-sm overflow-hidden flex flex-col shrink-0" style={{ height: '220px' }}>
         {/* Tabs */}
-        <div className="flex shrink-0 border-b border-black/8">
+        <div className="flex shrink-0 border-b-2 border-ink/8">
           {(['chat', 'players'] as const).map(tab => (
             <button
               key={tab}
               onClick={() => setMobileTab(tab)}
-              className={`flex-1 py-2 font-ui font-bold text-sm capitalize transition-all ${
+              className={`flex-1 py-2 font-ui font-bold text-sm capitalize transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
                 mobileTab === tab
                   ? 'text-brand-blue border-b-2 border-brand-blue'
                   : 'text-ink/40'
               }`}
             >
-              {tab === 'chat' ? 'Chat' : 'Players'}
+              {tab === 'chat'
+                ? <><IconChat size={13} /> Chat</>
+                : <><IconUsers size={13} /> Players</>
+              }
             </button>
           ))}
         </div>

@@ -1,3 +1,5 @@
+import { IconCrown, IconPencil } from './Icons';
+
 interface AvatarProps {
   name: string;
   color: string;
@@ -19,10 +21,21 @@ export default function Avatar({ name, color, size = 'md', isDrawing, isHost, ha
       >
         {initials}
       </div>
-      {isDrawing && <span className="absolute -top-1 -right-1 text-xs leading-none">✏️</span>}
-      {isHost && !isDrawing && <span className="absolute -top-1 -right-1 text-xs leading-none">👑</span>}
+
+      {isDrawing && (
+        <div className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-brand-blue border-2 border-white flex items-center justify-center">
+          <IconPencil size={9} className="text-white" />
+        </div>
+      )}
+      {isHost && !isDrawing && (
+        <div className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-brand-yellow border-2 border-ink flex items-center justify-center">
+          <IconCrown size={9} className="text-ink" />
+        </div>
+      )}
       {hasGuessed && (
-        <span className="absolute -bottom-1 -right-1 bg-brand-green border border-ink rounded-full w-4 h-4 flex items-center justify-center text-xs font-bold text-ink">✓</span>
+        <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-brand-green border-2 border-ink flex items-center justify-center">
+          <span className="text-ink font-black leading-none" style={{ fontSize: '9px' }}>✓</span>
+        </div>
       )}
     </div>
   );

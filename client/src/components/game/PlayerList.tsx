@@ -1,6 +1,24 @@
 import { useGame } from '../../context/GameContext';
 import Avatar from '../ui/Avatar';
 
+const RANK_COLORS: Record<number, string> = {
+  0: '#FFD166', // gold
+  1: '#C0C0C0', // silver
+  2: '#CD7F32', // bronze
+};
+
+function RankBadge({ rank }: { rank: number }) {
+  const bg = RANK_COLORS[rank] ?? '#FFFEF7';
+  return (
+    <div
+      className="w-6 h-6 rounded-full border-2 border-ink flex items-center justify-center font-display font-bold text-xs text-ink shrink-0"
+      style={{ backgroundColor: bg, boxShadow: '1px 1px 0 #1A1A2E', minWidth: '1.5rem' }}
+    >
+      {rank + 1}
+    </div>
+  );
+}
+
 export default function PlayerList() {
   const { state } = useGame();
   const { room, playerId, guessedPlayers, scorePopups } = state;
@@ -28,9 +46,7 @@ export default function PlayerList() {
             }`}
             style={{ boxShadow: '2px 2px 0 #1A1A2E' }}
           >
-            <span className="text-sm w-5 text-center shrink-0">
-              {rank === 0 ? '🥇' : rank === 1 ? '🥈' : rank === 2 ? '🥉' : `${rank + 1}`}
-            </span>
+            <RankBadge rank={rank} />
             <Avatar
               name={player.name}
               color={player.avatarColor}

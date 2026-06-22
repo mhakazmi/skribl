@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, FormEvent } from 'react';
 import { useSocket } from '../../context/SocketContext';
 import { useGame } from '../../context/GameContext';
 import { ChatMessageData } from '../../types/game';
+import { IconSend } from '../ui/Icons';
 
 function ChatMessage({ msg, myId }: { msg: ChatMessageData; myId: string | null }) {
   const isSystem = msg.type === 'system';
@@ -22,14 +23,16 @@ function ChatMessage({ msg, myId }: { msg: ChatMessageData; myId: string | null 
       isCorrect ? 'bg-brand-green/25 animate-correctFlash border border-brand-green/40' :
       isClose ? 'bg-brand-yellow/25 border border-brand-yellow/40' : ''
     }`}>
-      <span className={`font-black shrink-0 ${isMe ? 'text-brand-blue' : 'text-ink/70'}`}
-        style={{ maxWidth: '80px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+      <span
+        className={`font-black shrink-0 ${isMe ? 'text-brand-blue' : 'text-ink/70'}`}
+        style={{ maxWidth: '80px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
+      >
         {msg.playerName}:
       </span>
       <span className={`break-words font-semibold ${
         isCorrect ? 'text-brand-green' : isClose ? 'text-brand-orange' : 'text-ink/90'
       }`}>
-        {isCorrect ? '🎉 Correct!' : isClose ? `🔥 So close!` : msg.text}
+        {isCorrect ? '🎉 Correct!' : isClose ? '🔥 So close!' : msg.text}
       </span>
     </div>
   );
@@ -64,10 +67,10 @@ export default function ChatBox({ bare = false }: { bare?: boolean }) {
     : "Type your guess...";
 
   return (
-    <div className={`flex flex-col h-full overflow-hidden p-0 ${bare ? '' : 'card'}`}>
+    <div className={`flex flex-col h-full overflow-hidden ${bare ? '' : 'card'}`}>
       {!bare && (
         <div className="px-4 py-3 border-b-2 border-ink/10 flex items-center gap-2 shrink-0 bg-brand-blue/5">
-          <span className="font-ui font-black text-ink text-sm">Chat & Guesses</span>
+          <span className="font-ui font-black text-ink text-sm">Chat &amp; Guesses</span>
         </div>
       )}
 
@@ -97,9 +100,10 @@ export default function ChatBox({ bare = false }: { bare?: boolean }) {
           <button
             type="submit"
             disabled={isInputDisabled || !input.trim()}
-            className="btn btn-blue px-3 py-2 text-sm"
+            className="btn btn-blue px-3 py-2"
+            aria-label="Send message"
           >
-            ➤
+            <IconSend size={15} className="text-white" />
           </button>
         </div>
       </form>

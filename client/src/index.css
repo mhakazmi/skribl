@@ -99,6 +99,24 @@ body {
   opacity: 0.55;
 }
 
+/* ── Trophy glow ── */
+@keyframes trophyGlow {
+  0%, 100% { box-shadow: 4px 4px 0 #1A1A2E, 0 0 12px rgba(255,209,102,0.5); }
+  50%       { box-shadow: 4px 4px 0 #1A1A2E, 0 0 28px rgba(255,209,102,0.85); }
+}
+.trophy-glow { animation: trophyGlow 2s ease-in-out infinite; }
+
+/* ── Reduced motion ── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  .logo-letter { animation: none !important; }
+  .trophy-glow { animation: none !important; box-shadow: 4px 4px 0 #1A1A2E; }
+}
+
 /* ══════════════════════════════════
    Animated Logo
 ══════════════════════════════════ */

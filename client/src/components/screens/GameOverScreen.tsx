@@ -1,10 +1,24 @@
 import { useSocket } from '../../context/SocketContext';
 import { useGame } from '../../context/GameContext';
 import Avatar from '../ui/Avatar';
+import { IconTrophy, IconRefresh, IconLogout } from '../ui/Icons';
 
-const MEDALS = ['🥇', '🥈', '🥉'];
-const PODIUM_COLORS = ['bg-brand-yellow', 'bg-brand-green', 'bg-brand-orange'];
+const RANK_BG = ['#FFD166', '#C0C0C0', '#CD7F32']; // gold, silver, bronze
+
+function Medal({ rank }: { rank: number }) {
+  return (
+    <div
+      className="w-8 h-8 rounded-full border-2 border-ink flex items-center justify-center font-display font-bold text-sm text-ink shrink-0"
+      style={{ backgroundColor: RANK_BG[rank] ?? '#FFFEF7', boxShadow: '2px 2px 0 #1A1A2E' }}
+    >
+      {rank + 1}
+    </div>
+  );
+}
+
+const PODIUM_BG = ['#C0C0C0', '#FFD166', '#CD7F32']; // 2nd (left), 1st (center), 3rd (right)
 const PODIUM_HEIGHTS = ['h-20', 'h-28', 'h-16'];
+const PODIUM_LABELS = ['2nd', '1st', '3rd'];
 
 export default function GameOverScreen() {
   const socket = useSocket();
@@ -21,9 +35,8 @@ export default function GameOverScreen() {
   const handlePlayAgain = () => { socket.emit('game:restart'); dispatch({ type: 'RESET' }); };
   const handleLeave = () => { socket.emit('room:leave'); dispatch({ type: 'RESET' }); };
 
-  // Podium order: 2nd, 1st, 3rd
+  // Podium order: 2nd (left), 1st (center, tallest), 3rd (right)
   const podium = [finalScores[1], finalScores[0], finalScores[2]];
-  const podiumMedals = ['🥈', '🥇', '🥉'];
 
   return (
     <div className="game-bg min-h-screen flex flex-col items-center justify-center px-4 py-8 overflow-auto">
@@ -31,12 +44,21 @@ export default function GameOverScreen() {
 
         {/* Header */}
         <div className="text-center">
-          <div className="text-6xl mb-2 animate-bounce2">🏆</div>
-          <h1 className="font-display text-5xl text-white" style={{ textShadow: '5px 5px 0 #1D3BB3', WebkitTextStroke: '1px #1A1A2E' }}>
+          <div className="trophy-glow inline-flex items-center justify-center w-24 h-24 rounded-3xl border-2 border-ink bg-brand-yellow mb-3"
+            style={{ boxShadow: '4px 4px 0 #1A1A2E' }}>
+            <IconTrophy size={52} className="text-ink" />
+          </div>
+          <h1
+            className="font-display text-5xl text-white"
+            style={{ textShadow: '5px 5px 0 #1D3BB3', WebkitTextStroke: '1px #1A1A2E' }}
+          >
             Game Over!
           </h1>
           {winner && (
-            <p className="font-ui font-black text-xl mt-2" style={{ color: iWon ? '#FFD166' : '#fff', textShadow: '2px 2px 0 #1A1A2E' }}>
+            <p
+              className="font-ui font-black text-xl mt-2"
+              style={{ color: iWon ? '#FFD166' : '#fff', textShadow: '2px 2px 0 #1A1A2E' }}
+            >
               {iWon ? '🎉 You won!' : `🎉 ${winner.name} wins!`}
             </p>
           )}
@@ -45,20 +67,23 @@ export default function GameOverScreen() {
         {/* Podium */}
         {finalScores.length >= 2 && (
           <div className="card p-5">
-            <div className="flex items-end justify-center gap-2">
+            <div className="flex items-end justify-center gap-3">
               {podium.map((entry, pos) => {
                 if (!entry) return <div key={pos} className="w-24" />;
                 const player = room.players.find(p => p.id === entry.playerId);
                 return (
-                  <div key={entry.playerId} className="flex flex-col items-center gap-1.5 w-28">
+                  <div key={entry.playerId} className="flex flex-col items-center gap-2 w-28">
                     <Avatar name={entry.playerName} color={player?.avatarColor ?? '#4361EE'} size="lg" />
                     <p className="font-ui font-black text-xs text-ink text-center truncate w-full">{entry.playerName}</p>
                     <p className="font-display text-sm text-ink/60">{entry.score} pts</p>
                     <div
-                      className={`${PODIUM_HEIGHTS[pos]} ${PODIUM_COLORS[pos]} w-full rounded-t-xl border-2 border-ink flex items-center justify-center text-2xl`}
-                      style={{ boxShadow: 'inset 0 -3px 0 rgba(0,0,0,0.15)' }}
+                      className={`${PODIUM_HEIGHTS[pos]} w-full rounded-t-xl border-2 border-ink flex flex-col items-center justify-center gap-1`}
+                      style={{
+                        backgroundColor: PODIUM_BG[pos],
+                        boxShadow: 'inset 0 -4px 0 rgba(0,0,0,0.12), 3px 3px 0 #1A1A2E',
+                      }}
                     >
-                      {podiumMedals[pos]}
+                      <span className="font-display font-bold text-ink text-sm">{PODIUM_LABELS[pos]}</span>
                     </div>
                   </div>
                 );
@@ -75,9 +100,11 @@ export default function GameOverScreen() {
             return (
               <div
                 key={entry.playerId}
-                className={`flex items-center gap-3 px-4 py-3 border-b-2 border-ink/10 last:border-b-0 ${isMe ? 'bg-brand-blue/10' : i % 2 === 0 ? 'bg-white' : 'bg-paper'}`}
+                className={`flex items-center gap-3 px-4 py-3 border-b-2 border-ink/8 last:border-b-0 ${
+                  isMe ? 'bg-brand-blue/10' : i % 2 === 0 ? 'bg-white' : 'bg-paper'
+                }`}
               >
-                <span className="text-xl w-7 text-center shrink-0">{MEDALS[i] ?? `${i + 1}`}</span>
+                <Medal rank={i} />
                 <Avatar name={entry.playerName} color={player?.avatarColor ?? '#888'} size="sm" />
                 <span className={`flex-1 font-ui font-black ${isMe ? 'text-brand-blue' : 'text-ink'}`}>
                   {entry.playerName}{isMe && ' (You)'}
@@ -91,18 +118,21 @@ export default function GameOverScreen() {
         {/* Actions */}
         <div className="flex gap-3">
           {isHost && (
-            <button onClick={handlePlayAgain} className="btn btn-green flex-1 py-4 text-lg">
-              🎮 Play Again
+            <button onClick={handlePlayAgain} className="btn btn-green flex-1 py-4 text-lg gap-2">
+              <IconRefresh size={18} /> Play Again
             </button>
           )}
-          <button onClick={handleLeave} className={`btn btn-white py-4 text-lg ${isHost ? '' : 'flex-1'}`}>
-            🚪 Leave
+          <button
+            onClick={handleLeave}
+            className={`btn btn-white py-4 text-lg gap-2 ${isHost ? '' : 'flex-1'}`}
+          >
+            <IconLogout size={18} /> Leave
           </button>
         </div>
 
         {!isHost && (
           <p className="text-center text-white/60 font-ui font-bold text-sm">
-            Waiting for host to start a new game...
+            Waiting for host to start a new game…
           </p>
         )}
       </div>
