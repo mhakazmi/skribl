@@ -16,9 +16,9 @@ function Medal({ rank }: { rank: number }) {
   );
 }
 
-const PODIUM_BG = ['#C0C0C0', '#FFD166', '#CD7F32']; // 2nd (left), 1st (center), 3rd (right)
+const PODIUM_COLORS = ['bg-brand-yellow', 'bg-brand-green', 'bg-brand-orange'];
 const PODIUM_HEIGHTS = ['h-20', 'h-28', 'h-16'];
-const PODIUM_LABELS = ['2nd', '1st', '3rd'];
+const PODIUM_MEDALS = ['🥈', '🥇', '🥉'];
 
 export default function GameOverScreen() {
   const socket = useSocket();
@@ -77,13 +77,10 @@ export default function GameOverScreen() {
                     <p className="font-ui font-black text-xs text-ink text-center truncate w-full">{entry.playerName}</p>
                     <p className="font-display text-sm text-ink/60">{entry.score} pts</p>
                     <div
-                      className={`${PODIUM_HEIGHTS[pos]} w-full rounded-t-xl border-2 border-ink flex flex-col items-center justify-center gap-1`}
-                      style={{
-                        backgroundColor: PODIUM_BG[pos],
-                        boxShadow: 'inset 0 -4px 0 rgba(0,0,0,0.12), 3px 3px 0 #1A1A2E',
-                      }}
+                      className={`${PODIUM_HEIGHTS[pos]} ${PODIUM_COLORS[pos]} w-full rounded-t-xl border-2 border-ink flex items-center justify-center text-2xl`}
+                      style={{ boxShadow: 'inset 0 -3px 0 rgba(0,0,0,0.15)' }}
                     >
-                      <span className="font-display font-bold text-ink text-sm">{PODIUM_LABELS[pos]}</span>
+                      {PODIUM_MEDALS[pos]}
                     </div>
                   </div>
                 );

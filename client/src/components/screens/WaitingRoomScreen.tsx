@@ -3,7 +3,7 @@ import { useSocket } from '../../context/SocketContext';
 import { useGame } from '../../context/GameContext';
 import Avatar from '../ui/Avatar';
 import AnimatedLogo from '../ui/AnimatedLogo';
-import { IconCopy, IconCheck, IconPlay, IconUsers } from '../ui/Icons';
+import { IconCopy, IconCheck, IconPlay } from '../ui/Icons';
 
 export default function WaitingRoomScreen() {
   const socket = useSocket();
@@ -64,8 +64,7 @@ export default function WaitingRoomScreen() {
         {/* Players */}
         <div className="card p-5">
           <div className="flex items-center justify-between mb-3">
-            <h2 className="font-ui font-black text-ink flex items-center gap-1.5">
-              <IconUsers size={16} className="text-ink/60" />
+            <h2 className="font-ui font-black text-ink">
               Players ({room.players.length}/{room.settings.maxPlayers})
             </h2>
             <div className="flex gap-1">
@@ -114,7 +113,8 @@ export default function WaitingRoomScreen() {
           >
             {canStart
               ? <><IconPlay size={20} /> Start Game!</>
-              : <><IconUsers size={20} /> Need {needMore} more player{needMore !== 1 ? 's' : ''}…</>
+              : <>Need {needMore} more player{needMore !== 1 ? 's' : ''}…</>
+
             }
           </button>
         ) : (
