@@ -1,6 +1,12 @@
 import { Server, Socket } from 'socket.io';
 import { GameRoom } from '../game/GameRoom.js';
 import { RoomSettings } from '../types/game.js';
+import {
+  validateCreate,
+  validateJoin,
+  hashPassword,
+  rateLimiter,
+} from './validate.js';
 
 const rooms = new Map<string, GameRoom>();
 const socketToRoom = new Map<string, string>();
@@ -15,32 +21,58 @@ function generateRoomCode(): string {
 }
 
 export function registerRoomHandlers(io: Server, socket: Socket): void {
-  socket.on('room:create', ({ playerName, settings }: { playerName: string; settings: Partial<RoomSettings> }) => {
+
+  socket.on('room:create', async (raw: unknown) => {
+    // Rate-limit: burst of 3, refill 1 per 60 s — prevents rapid room spam
+    if (!rateLimiter.allow(socket.id, 'room', 3, 1 / 60)) return;
+
+    const payload = validateCreate(raw);
+    if (!payload) return;
+
+    const { playerName, password, settings: s } = payload;
     const code = generateRoomCode();
+
     const roomSettings: RoomSettings = {
-      maxPlayers: settings.maxPlayers ?? 8,
-      rounds: settings.rounds ?? 3,
-      drawTime: settings.drawTime ?? 80,
-      customWords: settings.customWords ?? [],
+      maxPlayers: s.maxPlayers,
+      rounds: s.rounds,
+      drawTime: s.drawTime,
+      customWords: s.customWords,
+      hasPassword: password.length > 0,
     };
 
-    const room = new GameRoom(code, io, roomSettings);
-    rooms.set(code, room);
+    try {
+      let pwHash: Buffer | null = null;
+      let pwSalt: Buffer | null = null;
+      if (password) {
+        const result = await hashPassword(password);
+        pwHash = result.hash;
+        pwSalt = result.salt;
+      }
 
-    const player = room.addPlayer(socket, playerName.trim().slice(0, 20) || 'Anonymous');
-    if (!player) {
+      const room = new GameRoom(code, io, roomSettings, pwHash, pwSalt);
+      rooms.set(code, room);
+
+      const player = room.addPlayer(socket, playerName);
+      if (!player) {
+        socket.emit('room:error', { code: 'CREATE_FAILED', message: 'Could not create room.' });
+        return;
+      }
+
+      socketToRoom.set(socket.id, code);
+      socket.join(code);
+      socket.emit('room:created', { roomCode: code, room: room.getRoomState(), playerId: socket.id });
+    } catch (err) {
+      console.error('[room:create] error:', err);
       socket.emit('room:error', { code: 'CREATE_FAILED', message: 'Could not create room.' });
-      return;
     }
-
-    socketToRoom.set(socket.id, code);
-    socket.join(code);
-    socket.emit('room:created', { roomCode: code, room: room.getRoomState(), playerId: socket.id });
   });
 
-  socket.on('room:join', ({ roomCode, playerName }: { roomCode: string; playerName: string }) => {
-    const code = roomCode.toUpperCase().trim();
-    const room = rooms.get(code);
+  socket.on('room:join', async (raw: unknown) => {
+    const payload = validateJoin(raw);
+    if (!payload) return;
+
+    const { roomCode, playerName, password } = payload;
+    const room = rooms.get(roomCode);
 
     if (!room) {
       socket.emit('room:error', { code: 'NOT_FOUND', message: 'Room not found.' });
@@ -55,25 +87,43 @@ export function registerRoomHandlers(io: Server, socket: Socket): void {
       return;
     }
 
-    const trimmedName = playerName.trim().slice(0, 20) || 'Anonymous';
+    // Password check
+    if (room.settings.hasPassword) {
+      if (!password) {
+        socket.emit('room:error', { code: 'PASSWORD_REQUIRED', message: 'This room requires a password.' });
+        return;
+      }
+      try {
+        const ok = await room.verifyPassword(password);
+        if (!ok) {
+          socket.emit('room:error', { code: 'WRONG_PASSWORD', message: 'Incorrect room password.' });
+          return;
+        }
+      } catch (err) {
+        console.error('[room:join] password verify error:', err);
+        socket.emit('room:error', { code: 'WRONG_PASSWORD', message: 'Incorrect room password.' });
+        return;
+      }
+    }
+
     const nameTaken = Array.from(room.players.values()).some(
-      p => p.name.toLowerCase() === trimmedName.toLowerCase(),
+      p => p.name.toLowerCase() === playerName.toLowerCase(),
     );
     if (nameTaken) {
       socket.emit('room:error', { code: 'NAME_TAKEN', message: 'Name already taken in this room.' });
       return;
     }
 
-    const player = room.addPlayer(socket, trimmedName);
+    const player = room.addPlayer(socket, playerName);
     if (!player) {
       socket.emit('room:error', { code: 'FULL', message: 'Room is full.' });
       return;
     }
 
-    socketToRoom.set(socket.id, code);
-    socket.join(code);
+    socketToRoom.set(socket.id, roomCode);
+    socket.join(roomCode);
     socket.emit('room:joined', { room: room.getRoomState(), playerId: socket.id });
-    socket.to(code).emit('room:updated', { room: room.getRoomState() });
+    socket.to(roomCode).emit('room:updated', { room: room.getRoomState() });
   });
 
   socket.on('room:leave', () => {
@@ -121,6 +171,8 @@ function handleDisconnect(
   rooms: Map<string, GameRoom>,
   socketToRoom: Map<string, string>,
 ): void {
+  rateLimiter.clear(socket.id); // clean up per-socket rate-limit state
+
   const code = socketToRoom.get(socket.id);
   if (!code) return;
   socketToRoom.delete(socket.id);
@@ -133,9 +185,7 @@ function handleDisconnect(
 
   if (room.isEmpty()) {
     setTimeout(() => {
-      if (rooms.get(code)?.isEmpty()) {
-        rooms.delete(code);
-      }
+      if (rooms.get(code)?.isEmpty()) rooms.delete(code);
     }, 30000);
     return;
   }

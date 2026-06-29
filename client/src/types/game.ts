@@ -19,6 +19,7 @@ export interface RoomSettings {
   rounds: number;
   drawTime: number;
   customWords: string[];
+  hasPassword: boolean;
 }
 
 export interface RoomState {

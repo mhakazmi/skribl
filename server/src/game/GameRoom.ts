@@ -3,6 +3,7 @@ import { Player, RoomSettings, RoomState, GameState, ScoreDelta } from '../types
 import { RoundManager } from './RoundManager.js';
 import { calculateGuesserScore, calculateDrawerBonus } from './ScoreManager.js';
 import { pickWords, resetUsed } from './WordBank.js';
+import { verifyPassword as _verifyPassword } from '../socket/validate.js';
 
 const AVATAR_COLORS = [
   '#FF6B6B', '#FFD93D', '#6BCB77', '#4F86F7',
@@ -50,10 +51,22 @@ export class GameRoom {
   private roundEndTimeout: ReturnType<typeof setTimeout> | null = null;
   private colorIndex = 0;
 
-  constructor(code: string, io: Server, settings: RoomSettings) {
+  constructor(
+    code: string,
+    io: Server,
+    settings: RoomSettings,
+    private passwordHash: Buffer | null = null,
+    private passwordSalt: Buffer | null = null,
+  ) {
     this.code = code;
     this.io = io;
     this.settings = settings;
+  }
+
+  /** Returns true if the supplied plaintext matches the room password (timing-safe). */
+  async verifyPassword(plain: string): Promise<boolean> {
+    if (!this.passwordHash || !this.passwordSalt) return true;
+    return _verifyPassword(plain, this.passwordHash, this.passwordSalt);
   }
 
   addPlayer(socket: Socket, name: string): Player | null {

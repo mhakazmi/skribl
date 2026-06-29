@@ -14,6 +14,8 @@ export default function LobbyScreen() {
   const [rounds, setRounds] = useState(3);
   const [drawTime, setDrawTime] = useState(80);
   const [maxPlayers, setMaxPlayers] = useState(8);
+  const [roomPassword, setRoomPassword] = useState('');
+  const [joinPassword, setJoinPassword] = useState('');
   const [loading, setLoading] = useState(false);
 
   const saveName = (n: string) => { setName(n); localStorage.setItem('skribl-name', n); };
@@ -23,7 +25,7 @@ export default function LobbyScreen() {
     if (!name.trim()) return;
     dispatch({ type: 'SET_ERROR', payload: null });
     setLoading(true);
-    socket.emit('room:create', { playerName: name.trim(), settings: { rounds, drawTime, maxPlayers, customWords: [] } });
+    socket.emit('room:create', { playerName: name.trim(), password: roomPassword, settings: { rounds, drawTime, maxPlayers, customWords: [] } });
     setTimeout(() => setLoading(false), 3000);
   };
 
@@ -32,7 +34,7 @@ export default function LobbyScreen() {
     if (!name.trim() || !roomCode.trim()) return;
     dispatch({ type: 'SET_ERROR', payload: null });
     setLoading(true);
-    socket.emit('room:join', { roomCode: roomCode.toUpperCase(), playerName: name.trim() });
+    socket.emit('room:join', { roomCode: roomCode.toUpperCase(), playerName: name.trim(), password: joinPassword });
     setTimeout(() => setLoading(false), 3000);
   };
 
@@ -114,6 +116,16 @@ export default function LobbyScreen() {
                 ))}
               </div>
 
+              <Input
+                label="Room Password"
+                type="password"
+                placeholder="Leave blank for open room"
+                value={roomPassword}
+                onChange={e => setRoomPassword(e.target.value)}
+                maxLength={100}
+                autoComplete="new-password"
+              />
+
               <button
                 type="submit"
                 disabled={loading || !name.trim()}
@@ -147,6 +159,16 @@ export default function LobbyScreen() {
                   style={{ boxShadow: '3px 3px 0 #1A1A2E' }}
                 />
               </div>
+              <Input
+                label="Room Password"
+                type="password"
+                placeholder="Leave blank if no password"
+                value={joinPassword}
+                onChange={e => setJoinPassword(e.target.value)}
+                maxLength={100}
+                autoComplete="current-password"
+              />
+
               <button
                 type="submit"
                 disabled={loading || !name.trim() || roomCode.length !== 4}

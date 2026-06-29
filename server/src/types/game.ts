@@ -19,6 +19,7 @@ export interface RoomSettings {
   rounds: number;
   drawTime: number;
   customWords: string[];
+  hasPassword: boolean; // true when room is password-protected (never expose hash/plaintext)
 }
 
 export interface RoomState {
