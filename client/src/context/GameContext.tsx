@@ -23,6 +23,7 @@ export interface GameContextState {
   currentHint: string | null;
   timeLeft: number | null;
   roundWord: string | null; // revealed at round end
+  preRoundScores: Record<string, number>; // player scores snapshot at round start, for delta display
   finalScores: Array<{ playerId: string; playerName: string; score: number }> | null;
   winnerId: string | null;
   scorePopups: ScorePopupEntry[];
@@ -58,6 +59,7 @@ const initialState: GameContextState = {
   currentHint: null,
   timeLeft: null,
   roundWord: null,
+  preRoundScores: {},
   finalScores: null,
   winnerId: null,
   scorePopups: [],
@@ -103,6 +105,9 @@ function reducer(state: GameContextState, action: Action): GameContextState {
         wordOptions: [],
         guessedPlayers: new Set(),
         messages: [],
+        preRoundScores: state.room
+          ? Object.fromEntries(state.room.players.map(p => [p.id, p.score]))
+          : {},
       };
     case 'UPDATE_PLAYER_SCORE': {
       if (!state.room) return state;
